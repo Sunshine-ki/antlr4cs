@@ -49,27 +49,34 @@ namespace Antlr4.Runtime.Tree
         /// is used on the
         /// node payloads to get the text for the nodes.
         /// </remarks>
-        public static string ToStringTree([NotNull] ITree t, [Nullable] IList<string> ruleNames)
+        public static string ToStringTree([NotNull] ITree t, [Nullable] IList<string> ruleNames, int depth = 0)
         {
             string s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
+            depth++;
+            StringBuilder buf = new StringBuilder();
+            //buf.Append($"depth: {depth}");
+            for (int i = 0; i < depth; i++)
+            {
+                buf.Append("__");
+            }
             if (t.ChildCount == 0)
             {
-                return s;
+                buf.Append($"{s} (depth: {depth})\n");
+                return buf.ToString();
             }
-            StringBuilder buf = new StringBuilder();
-            buf.Append("(");
+            //buf.Append("(");
             s = Utils.EscapeWhitespace(GetNodeText(t, ruleNames), false);
-            buf.Append(s);
-            buf.Append(' ');
+            buf.Append($"{s} (depth: {depth})\n");
             for (int i = 0; i < t.ChildCount; i++)
             {
                 if (i > 0)
                 {
                     buf.Append(' ');
                 }
-                buf.Append(ToStringTree(t.GetChild(i), ruleNames));
+                buf.Append(ToStringTree(t.GetChild(i), ruleNames, depth));
             }
-            buf.Append(")");
+            depth--;
+            //buf.Append(")");
             return buf.ToString();
         }
 
